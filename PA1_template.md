@@ -7,7 +7,8 @@ output:
 
 ## Loading and preprocessing the data
 
-```{R echo=TRUE}
+
+```r
 unzip("activity.zip")
 activity <- read.csv(file = 'activity.csv')
 ```
@@ -16,50 +17,60 @@ activity <- read.csv(file = 'activity.csv')
 
 Histogram of the steps taken each day
 
-```{R echo=TRUE}
+
+```r
 steps <- tapply(activity$steps, activity$date, sum, na.rm = TRUE)
 hist(steps, col="blue", breaks=10)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
 Mean and median of the total number of steps taken per day
 
-```{R echo=TRUE}
+
+```r
 meansteps <- mean(steps)
 meadiansteps <- median(steps)
 ```
 
-The mean is `r meansteps` and the median is `r meadiansteps`
+The mean is 9354.2295082 and the median is 10395
 
 ## What is the average daily activity pattern?
 
 Average daily activity pattern
 
-```{R echo=TRUE}
+
+```r
 interval <- tapply(activity$steps, activity$interval, mean, na.rm = TRUE)
 plot(interval, type = "l", main="Average daily activity pattern",
      xlab = "5-minute interval", ylab = "Average number of steps taken")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
 Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{R echo=TRUE}
+
+```r
 asc <- interval[order(-interval)]
 max <- asc[1]
 ```
 
-The interval of `r names(max)` has `r max` as the maximum value.
+The interval of 835 has 206.1698113 as the maximum value.
 
 ## Imputing missing values
 
-```{R echo=TRUE}
+
+```r
 totalna <- sum(is.na(activity$steps))
 ```
 
-The amount of missing values is `r totalna`.
+The amount of missing values is 2304.
 
 Filling in all of the missing values in the dataset
 
-```{R echo=TRUE}
+
+```r
 medianactivity <- tapply(activity$steps, activity$interval, median, na.rm = TRUE)
 newactivity <- activity
 for (i in names(medianactivity)) {
@@ -72,14 +83,18 @@ for (i in names(medianactivity)) {
 
 Histogram of the total number of new steps taken each day
 
-```{R echo=TRUE}
+
+```r
 newsteps <- tapply(newactivity$steps, newactivity$date, sum)
 hist(newsteps, col="red", breaks=10)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 Mean and median of the total number of new steps taken per day
 
-```{R echo=TRUE}
+
+```r
 meanperday <- tapply(activity$steps, activity$date, mean)
 medianperday <- tapply(activity$steps, activity$date, median)
 newmeanperday <- tapply(newactivity$steps, newactivity$date, mean)
@@ -88,13 +103,19 @@ newmedianperday <- tapply(newactivity$steps, newactivity$date, median)
 
 Histogram of means 
 
-```{R echo=TRUE}
+
+```r
 hist(meanperday, col="blue", breaks = 10)
 ```
 
-```{R echo=TRUE}
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
+
+```r
 hist(newmeanperday, col="red", breaks = 10)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 The new values differ from the estimates from the first part of the report. We see an increase in the interval near zero thanks to the missing values replaced.
 
@@ -102,7 +123,8 @@ The new values differ from the estimates from the first part of the report. We s
 
 Creating a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
 
-```{R echo=TRUE}
+
+```r
 newactivity$week <- "weekday"
 for (i in 1:length(newactivity$steps)){
   if(weekdays(as.Date(newactivity$date[i], "%Y-%m-%d"))=="sábado" |
@@ -115,10 +137,13 @@ newactivity$week <- as.factor(newactivity$week)
 
 Panel plot containing a time series plot of the 5-minute interval and the average number of steps taken, averaged across all weekday days or weekend days.
 
-```{R echo=TRUE}
+
+```r
 library(lattice)
 aggr <- aggregate(steps ~ interval + week, newactivity, mean)
 xyplot(steps ~ interval | week, data = aggr, type = "l", 
        xlab = "5-minute interval", 
        ylab = "average steps taken")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
